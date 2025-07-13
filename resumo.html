@@ -95,7 +95,7 @@
 </ul>
 
 <!-- BOTÃO PARA ZERAR CAMPOS COM SENHA -->
-<button class="botao-zerar" onclick="zerarValores()">🧹 Zerar Valores Mensais</button>
+<button class="botao-zerar" onclick="zerarValores()">🔐 Zerar Valores Mensais (Admin)</button>
 
 <script>
   function carregarResumo() {
@@ -129,10 +129,19 @@
   function zerarValores() {
     const senha = prompt("Digite a senha para zerar os valores:");
     if (senha === "1234") {
-      const investimento = parseFloat(window.valorInvestimento) || 0;
-      localStorage.setItem('total', investimento.toFixed(2));
-      alert("Valores zerados com sucesso (Investimento mantido).");
-      carregarResumo();
+      const totalAtual = parseFloat(localStorage.getItem('total')) || 0;
+      const valorInvestimento = totalAtual * 0.30;
+
+      localStorage.setItem('total', valorInvestimento.toFixed(2));
+      window.valorInvestimento = valorInvestimento;
+
+      document.getElementById('total').textContent = `R$ ${valorInvestimento.toFixed(2)}`;
+      document.getElementById('dizimo').textContent = `R$ 0.00`;
+      document.getElementById('contas').textContent = `R$ 0.00`;
+      document.getElementById('alimentacao').textContent = `R$ 0.00`;
+      document.getElementById('investimento-valor').textContent = '••••••••';
+
+      alert("✅ Valores zerados com sucesso. Investimento foi mantido.");
     } else {
       alert("❌ Senha incorreta. Ação cancelada.");
     }
