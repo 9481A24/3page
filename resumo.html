@@ -1,5 +1,4 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -52,7 +51,8 @@
       font-size: 20px;
       margin-left: 8px;
     }
-    .botao-zerar {
+    /* Botão para zerar */
+    #botao-zerar {
       display: block;
       margin: 30px auto 0;
       padding: 12px 24px;
@@ -64,7 +64,7 @@
       cursor: pointer;
       transition: transform 0.2s, background 0.3s;
     }
-    .botao-zerar:hover {
+    #botao-zerar:hover {
       transform: scale(1.05);
       background: linear-gradient(135deg, #e60000, #990000);
     }
@@ -81,7 +81,7 @@
 <h2>📊 Resumo Financeiro Atual</h2>
 
 <h3>Total Atual:</h3>
-<p style="text-align: center; font-size: 2em; font-weight: bold;" id="total">R$ 0.00</p>
+<p id="total" style="text-align: center; font-size: 2em; font-weight: bold;">R$ 0.00</p>
 
 <h3>Divisão Atual:</h3>
 <ul>
@@ -94,31 +94,32 @@
   </li>
 </ul>
 
-<button class="botao-zerar" onclick="zerarValores()">🔐 Zerar Valores Mensais (Admin)</button>
+<!-- Botão para zerar valores com senha -->
+<button id="botao-zerar">🔐 Zerar Valores Mensais (Admin)</button>
 
 <script>
+  // Função para carregar e mostrar os valores
   function carregarResumo() {
-    const totalStr = localStorage.getItem('total') || "0";
-    const total = parseFloat(totalStr);
-
-    const investimentoAcumuladoStr = localStorage.getItem('investimentoAcumulado') || "0";
-    const investimentoAcumulado = parseFloat(investimentoAcumuladoStr);
+    const totalStr = localStorage.getItem('total');
+    const total = totalStr ? parseFloat(totalStr) : 0;
 
     document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
 
     const dizimo = total * 0.10;
     const contas = total * 0.30;
     const alimentacao = total * 0.30;
+    const investimento = total * 0.30;
 
     document.getElementById('dizimo').textContent = `R$ ${dizimo.toFixed(2)}`;
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    window.valorInvestimento = investimentoAcumulado;
+    window.valorInvestimento = investimento;
 
     const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
 
+    // Botão olho para mostrar/esconder investimento
     document.getElementById('toggle-investimento').onclick = () => {
       if (investimentoElem.textContent === '••••••••') {
         investimentoElem.textContent = `R$ ${window.valorInvestimento.toFixed(2)}`;
@@ -128,31 +129,33 @@
     };
   }
 
+  // Função para zerar valores, protegida por senha
   function zerarValores() {
-    const senha = prompt("Digite a senha para zerar os valores:");
+    const senha = prompt("Digite a senha de administrador:");
     if (senha === "1234") {
-      const totalAtual = parseFloat(localStorage.getItem('total')) || 0;
-      const investimentoAcumuladoStr = localStorage.getItem('investimentoAcumulado') || "0";
-      let investimentoAcumulado = parseFloat(investimentoAcumuladoStr);
+      localStorage.setItem('total', '0'); // zera total no armazenamento local
 
-      const investimentoMes = totalAtual * 0.30;
-      investimentoAcumulado += investimentoMes;
-
-      localStorage.setItem('investimentoAcumulado', investimentoAcumulado.toFixed(2));
-      localStorage.setItem('total', '0');
-
-      window.valorInvestimento = investimentoAcumulado;
+      // Atualiza a página para mostrar zeros
       document.getElementById('total').textContent = `R$ 0.00`;
       document.getElementById('dizimo').textContent = `R$ 0.00`;
       document.getElementById('contas').textContent = `R$ 0.00`;
       document.getElementById('alimentacao').textContent = `R$ 0.00`;
-      document.getElementById('investimento-valor').textContent = '••••••••';
+
+      // Investimento fica como está (não mexe)
+
+    } else {
+      alert("❌ Senha incorreta. Ação cancelada.");
     }
   }
 
+  // Evento para o botão zerar chamar a função zerarValores
+  document.getElementById('botao-zerar').addEventListener('click', zerarValores);
+
+  // Quando a página carregar, chama carregarResumo para mostrar os dados
   window.onload = carregarResumo;
 </script>
 
 </body>
 </html>
+
      
