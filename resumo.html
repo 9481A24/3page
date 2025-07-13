@@ -1,57 +1,74 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Resumo Financeiro</title>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f0f2f5;
-    padding: 20px;
-    color: #333;
-    max-width: 720px;
-    margin: auto;
-  }
-  nav {
-    margin-bottom: 20px;
-  }
-  nav a {
-    margin-right: 15px;
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  nav a:hover {
-    text-decoration: underline;
-  }
-  h2, h3 {
-    text-align: center;
-  }
-  ul {
-    list-style: none;
-    padding-left: 0;
-    font-size: 1.1em;
-  }
-  ul li {
-    margin: 8px 0;
-    display: flex;
-    justify-content: space-between;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  #investimento-valor {
-    user-select: none;
-    font-weight: bold;
-  }
-  #toggle-investimento {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    margin-left: 8px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Resumo Financeiro</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      padding: 20px;
+      color: #333;
+      max-width: 720px;
+      margin: auto;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+      font-size: 1.1em;
+    }
+    ul li {
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #investimento-valor {
+      user-select: none;
+      font-weight: bold;
+    }
+    #toggle-investimento {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      margin-left: 8px;
+    }
+    .botao-zerar {
+      display: block;
+      margin: 30px auto 0;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #ff4d4d, #cc0000);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .botao-zerar:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #e60000, #990000);
+    }
+  </style>
 </head>
 <body>
 
@@ -77,6 +94,9 @@
   </li>
 </ul>
 
+<!-- BOTÃO PARA ZERAR CAMPOS COM SENHA -->
+<button class="botao-zerar" onclick="zerarValores()">🧹 Zerar Valores Mensais</button>
+
 <script>
   function carregarResumo() {
     const totalStr = localStorage.getItem('total');
@@ -92,8 +112,7 @@
     document.getElementById('dizimo').textContent = `R$ ${dizimo.toFixed(2)}`;
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
-
-    window.valorInvestimento = investimento; // guarda valor para botão
+    window.valorInvestimento = investimento;
 
     const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
@@ -105,6 +124,18 @@
         investimentoElem.textContent = '••••••••';
       }
     });
+  }
+
+  function zerarValores() {
+    const senha = prompt("Digite a senha para zerar os valores:");
+    if (senha === "1234") {
+      const investimento = parseFloat(window.valorInvestimento) || 0;
+      localStorage.setItem('total', investimento.toFixed(2));
+      alert("Valores zerados com sucesso (Investimento mantido).");
+      carregarResumo();
+    } else {
+      alert("❌ Senha incorreta. Ação cancelada.");
+    }
   }
 
   window.onload = carregarResumo;
