@@ -1,5 +1,5 @@
 
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -136,24 +136,17 @@
       let investimentoAcumulado = parseFloat(investimentoAcumuladoStr);
 
       const investimentoMes = totalAtual * 0.30;
-
       investimentoAcumulado += investimentoMes;
 
       localStorage.setItem('investimentoAcumulado', investimentoAcumulado.toFixed(2));
-
       localStorage.setItem('total', '0');
 
       window.valorInvestimento = investimentoAcumulado;
-
       document.getElementById('total').textContent = `R$ 0.00`;
       document.getElementById('dizimo').textContent = `R$ 0.00`;
       document.getElementById('contas').textContent = `R$ 0.00`;
       document.getElementById('alimentacao').textContent = `R$ 0.00`;
       document.getElementById('investimento-valor').textContent = '••••••••';
-
-      alert("✅ Valores zerados com sucesso. Investimento permanece acumulado.");
-    } else {
-      alert("❌ Senha incorreta. Ação cancelada.");
     }
   }
 
@@ -162,3 +155,4 @@
 
 </body>
 </html>
+     
