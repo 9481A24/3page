@@ -94,54 +94,64 @@
   </li>
 </ul>
 
-<!-- BOTÃO PARA ZERAR CAMPOS COM SENHA -->
 <button class="botao-zerar" onclick="zerarValores()">🔐 Zerar Valores Mensais (Admin)</button>
 
 <script>
   function carregarResumo() {
-    const totalStr = localStorage.getItem('total');
-    const total = totalStr ? parseFloat(totalStr) : 0;
+    const totalStr = localStorage.getItem('total') || "0";
+    const total = parseFloat(totalStr);
+
+    const investimentoAcumuladoStr = localStorage.getItem('investimentoAcumulado') || "0";
+    const investimentoAcumulado = parseFloat(investimentoAcumuladoStr);
 
     document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
 
     const dizimo = total * 0.10;
     const contas = total * 0.30;
     const alimentacao = total * 0.30;
-    const investimento = total * 0.30;
 
     document.getElementById('dizimo').textContent = `R$ ${dizimo.toFixed(2)}`;
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
-    window.valorInvestimento = investimento;
+
+    window.valorInvestimento = investimentoAcumulado;
 
     const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
 
-    document.getElementById('toggle-investimento').addEventListener('click', () => {
+    document.getElementById('toggle-investimento').onclick = () => {
       if (investimentoElem.textContent === '••••••••') {
         investimentoElem.textContent = `R$ ${window.valorInvestimento.toFixed(2)}`;
       } else {
         investimentoElem.textContent = '••••••••';
       }
-    });
+    };
   }
 
   function zerarValores() {
     const senha = prompt("Digite a senha para zerar os valores:");
     if (senha === "1234") {
       const totalAtual = parseFloat(localStorage.getItem('total')) || 0;
-      const valorInvestimento = totalAtual * 0.30;
+      const investimentoAcumuladoStr = localStorage.getItem('investimentoAcumulado') || "0";
+      let investimentoAcumulado = parseFloat(investimentoAcumuladoStr);
 
-      localStorage.setItem('total', valorInvestimento.toFixed(2));
-      window.valorInvestimento = valorInvestimento;
+      const investimentoMes = totalAtual * 0.30;
 
-      document.getElementById('total').textContent = `R$ ${valorInvestimento.toFixed(2)}`;
+      investimentoAcumulado += investimentoMes;
+
+      localStorage.setItem('investimentoAcumulado', investimentoAcumulado.toFixed(2));
+
+      localStorage.setItem('total', '0');
+
+      window.valorInvestimento = investimentoAcumulado;
+
+      document.getElementById('total').textContent = `R$ 0.00`;
       document.getElementById('dizimo').textContent = `R$ 0.00`;
       document.getElementById('contas').textContent = `R$ 0.00`;
       document.getElementById('alimentacao').textContent = `R$ 0.00`;
       document.getElementById('investimento-valor').textContent = '••••••••';
 
-      alert("✅ Valores zerados com sucesso. Investimento foi mantido.");
+      alert("✅ Valores zerados com sucesso. Investimento permanece acumulado.");
     } else {
       alert("❌ Senha incorreta. Ação cancelada.");
     }
