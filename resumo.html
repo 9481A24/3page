@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Resumo Financeiro</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+    padding: 20px;
+    color: #333;
+    max-width: 720px;
+    margin: auto;
+  }
+  nav {
+    margin-bottom: 20px;
+  }
+  nav a {
+    margin-right: 15px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  nav a:hover {
+    text-decoration: underline;
+  }
+  h2, h3 {
+    text-align: center;
+  }
+  ul {
+    list-style: none;
+    padding-left: 0;
+    font-size: 1.1em;
+  }
+  ul li {
+    margin: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #investimento-valor {
+    user-select: none;
+    font-weight: bold;
+  }
+  #toggle-investimento {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="entradas.html">Entradas</a> |
+  <a href="resumo.html">Resumo</a> |
+  <a href="historico.html">Histórico</a>
+</nav>
+
+<h2>📊 Resumo Financeiro Atual</h2>
+
+<h3>Total Atual:</h3>
+<p style="text-align: center; font-size: 2em; font-weight: bold;" id="total">R$ 0.00</p>
+
+<h3>Divisão Atual:</h3>
+<ul>
+  <li>🛐 Dízimo (10%): <span id="dizimo">R$ 0.00</span></li>
+  <li>💡 Contas (30%): <span id="contas">R$ 0.00</span></li>
+  <li>🍽️ Alimentação (30%): <span id="alimentacao">R$ 0.00</span></li>
+  <li>📈 Investimento (30%): 
+    <span id="investimento-valor">••••••••</span>
+    <button id="toggle-investimento" aria-label="Mostrar/ocultar investimento">👁️</button>
+  </li>
+</ul>
+
+<script>
+  function carregarResumo() {
+    const totalStr = localStorage.getItem('total');
+    const total = totalStr ? parseFloat(totalStr) : 0;
+
+    document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
+
+    const dizimo = total * 0.10;
+    const contas = total * 0.30;
+    const alimentacao = total * 0.30;
+    const investimento = total * 0.30;
+
+    document.getElementById('dizimo').textContent = `R$ ${dizimo.toFixed(2)}`;
+    document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
+    document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
+
+    window.valorInvestimento = investimento; // guarda valor para botão
+
+    const investimentoElem = document.getElementById('investimento-valor');
+    investimentoElem.textContent = '••••••••';
+
+    document.getElementById('toggle-investimento').addEventListener('click', () => {
+      if (investimentoElem.textContent === '••••••••') {
+        investimentoElem.textContent = `R$ ${window.valorInvestimento.toFixed(2)}`;
+      } else {
+        investimentoElem.textContent = '••••••••';
+      }
+    });
+  }
+
+  window.onload = carregarResumo;
+</script>
+
+</body>
+</html>
