@@ -1,76 +1,77 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Entradas Financeiras</title>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f0f2f5;
-    padding: 20px;
-    color: #333;
-    max-width: 720px;
-    margin: auto;
-  }
-  nav {
-    margin-bottom: 20px;
-  }
-  nav a {
-    margin-right: 15px;
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  nav a:hover {
-    text-decoration: underline;
-  }
-  h2, h3 {
-    text-align: center;
-  }
-  label {
-    display: block;
-    margin-top: 15px;
-    font-weight: bold;
-  }
-  input[type="text"],
-  input[type="date"],
-  input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  button {
-    width: 100%;
-    margin-top: 25px;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    transition: background-color .3s;
-  }
-  button:hover {
-    background-color: #218838;
-  }
-  .entrada-bloco {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  .entrada-bloco > div {
-    flex: 1 1 48%;
-    min-width: 300px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Entradas Financeiras</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      padding: 20px;
+      color: #333;
+      max-width: 720px;
+      margin: auto;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+      transition: background-color .3s;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .entrada-bloco {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .entrada-bloco > div {
+      flex: 1 1 48%;
+      min-width: 300px;
+    }
+  </style>
 </head>
 <body>
 
 <nav>
-  <a href="entradas.html">Entradas</a> |
+  <a href="index.html">Entradas</a> |
   <a href="resumo.html">Resumo</a> |
   <a href="historico.html">Histórico</a>
 </nav>
@@ -97,7 +98,7 @@
   </div>
 </div>
 
-<h3>Entradas com data programada fixa (Altere datas no código)</h3>
+<h3>Entradas com data programada fixa</h3>
 <div class="entrada-bloco">
   <div>
     <label>📝 Entrada 3 Origem:</label>
@@ -115,9 +116,17 @@
 
 <button onclick="registrarEntradas()">Registrar Entradas</button>
 
-<h3>Importar entradas de arquivo CSV</h3>
+<h3>📥 Importar entradas de arquivo CSV</h3>
 <input type="file" id="fileInput" accept=".csv" />
 <button onclick="importarCSV()">Importar CSV</button>
+
+<!-- Botão para imprimir relatório -->
+<button onclick="imprimirRelatorio()" style="background-color:#6c757d;">🖨️ Imprimir Relatório</button>
+
+<!-- Botão para ir para a próxima página -->
+<a href="resumo.html">
+  <button style="background-color:#007bff;">Próximo ➡️</button>
+</a>
 
 <script>
   const datasProgramadas = {
@@ -129,64 +138,48 @@
     return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
   }
 
-  function salvarDadosLocal(total, historico, divisaoHTML) {
-    localStorage.setItem('total', total.toFixed(2));
-    localStorage.setItem('historico', historico);
-    localStorage.setItem('divisao', divisaoHTML);
-  }
-
-  function carregarDadosSalvos() {
-    // Aqui não usado, será no resumo e histórico
-  }
-
   function registrarEntradas() {
     const hoje = new Date();
     let total = parseFloat(localStorage.getItem('total')) || 0;
     let historicoNovo = '';
 
-    for(let i =1; i <=2; i++) {
+    for (let i = 1; i <= 2; i++) {
       const origem = document.getElementById(`origem${i}`).value.trim();
       const valor = parseFloat(document.getElementById(`valor${i}`).value);
       const dataStr = document.getElementById(`data${i}`).value;
-
-      if(!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
+      if (!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
 
       const dataEntrada = new Date(dataStr);
-      if(dataEntrada <= hoje) {
+      if (dataEntrada <= hoje) {
         total += valor;
         historicoNovo += `📅 ${formatDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
       }
     }
 
-    for(let i = 3; i <=4; i++) {
+    for (let i = 3; i <= 4; i++) {
       const origem = document.getElementById(`origem${i}`).value.trim();
       const valor = parseFloat(document.getElementById(`valor${i}`).value);
       const dataStr = datasProgramadas[i];
-
-      if(!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
-
       const dataEntrada = new Date(dataStr);
-      if(dataEntrada <= hoje) {
+      if (dataEntrada <= hoje && origem && valor > 0) {
         total += valor;
         historicoNovo += `📅 ${formatDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
       }
     }
 
-    // Atualiza localStorage
     let historicoExistente = localStorage.getItem('historico') || '';
     historicoExistente += historicoNovo;
     localStorage.setItem('historico', historicoExistente);
     localStorage.setItem('total', total.toFixed(2));
 
-    alert('Entradas registradas com sucesso!\n\nTotal atualizado: R$ ' + total.toFixed(2));
+    alert('Entradas registradas com sucesso!\nTotal: R$ ' + total.toFixed(2));
   }
 
-  // Função para importar CSV e lançar as entradas
   function importarCSV() {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
     if (!file) {
-      alert('Selecione um arquivo CSV para importar.');
+      alert('Selecione um arquivo CSV.');
       return;
     }
     const reader = new FileReader();
@@ -195,9 +188,9 @@
       const linhas = texto.split('\n');
       let total = parseFloat(localStorage.getItem('total')) || 0;
       let historicoNovo = '';
+      const hoje = new Date();
 
       linhas.forEach(linha => {
-        // Espera CSV com formato: origem,data(yyyy-mm-dd),valor
         const colunas = linha.trim().split(',');
         if (colunas.length < 3) return;
         const origem = colunas[0].trim();
@@ -205,22 +198,56 @@
         const valor = parseFloat(colunas[2].trim());
         if (!origem || isNaN(valor) || valor <= 0 || !dataStr) return;
         const dataEntrada = new Date(dataStr);
-        const hoje = new Date();
         if (dataEntrada <= hoje) {
           total += valor;
           historicoNovo += `📅 ${formatDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
         }
       });
 
-      // Atualiza localStorage
       let historicoExistente = localStorage.getItem('historico') || '';
       historicoExistente += historicoNovo;
       localStorage.setItem('historico', historicoExistente);
       localStorage.setItem('total', total.toFixed(2));
 
-      alert('CSV importado com sucesso!\n\nTotal atualizado: R$ ' + total.toFixed(2));
+      alert('Importado com sucesso!\nTotal: R$ ' + total.toFixed(2));
     };
     reader.readAsText(file);
+  }
+
+  function imprimirRelatorio() {
+    const total = localStorage.getItem('total') || 'R$ 0.00';
+    const historico = localStorage.getItem('historico') || 'Sem histórico';
+    const divisao = localStorage.getItem('divisao') || '<p>Sem divisão disponível</p>';
+
+    const htmlRelatorio = `
+      <html>
+      <head>
+        <title>Relatório Financeiro</title>
+        <style>
+          body { font-family: 'Segoe UI', sans-serif; padding: 20px; color: #333; }
+          h2, h3 { text-align: center; }
+          .section { margin-bottom: 20px; }
+          .historico { background: #f9f9f9; padding: 10px; border-radius: 8px; white-space: pre-wrap; }
+        </style>
+      </head>
+      <body>
+        <h2>📒 Relatório Financeiro</h2>
+        <div class="section"><h3>Total Atual</h3><p>${total}</p></div>
+        <div class="section"><h3>Divisão Atual</h3>${divisao}</div>
+        <div class="section"><h3>Histórico</h3><div class="historico">${historico.replace(/\n/g, '<br>')}</div></div>
+        <script>
+          window.onload = () => {
+            window.print();
+            setTimeout(() => window.close(), 100);
+          }
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    const novaJanela = window.open('', '', 'width=800,height=600');
+    novaJanela.document.write(htmlRelatorio);
+    novaJanela.document.close();
   }
 </script>
 
