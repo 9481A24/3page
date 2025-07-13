@@ -1,74 +1,58 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Resumo Financeiro</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
-      padding: 20px;
-      color: #333;
-      max-width: 720px;
-      margin: auto;
-    }
-    nav {
-      margin-bottom: 20px;
-    }
-    nav a {
-      margin-right: 15px;
-      color: #007bff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    h2, h3 {
-      text-align: center;
-    }
-    ul {
-      list-style: none;
-      padding-left: 0;
-      font-size: 1.1em;
-    }
-    ul li {
-      margin: 8px 0;
-      display: flex;
-      justify-content: space-between;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #investimento-valor {
-      user-select: none;
-      font-weight: bold;
-    }
-    #toggle-investimento {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 20px;
-      margin-left: 8px;
-    }
-    /* Botão para zerar */
-    #botao-zerar {
-      display: block;
-      margin: 30px auto 0;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #ff4d4d, #cc0000);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.3s;
-    }
-    #botao-zerar:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #e60000, #990000);
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Resumo Financeiro</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+    padding: 20px;
+    color: #333;
+    max-width: 720px;
+    margin: auto;
+  }
+  nav {
+    margin-bottom: 20px;
+  }
+  nav a {
+    margin-right: 15px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  nav a:hover {
+    text-decoration: underline;
+  }
+  h2, h3 {
+    text-align: center;
+  }
+  ul {
+    list-style: none;
+    padding-left: 0;
+    font-size: 1.1em;
+  }
+  ul li {
+    margin: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #investimento-valor {
+    user-select: none;
+    font-weight: bold;
+  }
+  #toggle-investimento {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 8px;
+  }
+</style>
 </head>
 <body>
 
@@ -81,7 +65,7 @@
 <h2>📊 Resumo Financeiro Atual</h2>
 
 <h3>Total Atual:</h3>
-<p id="total" style="text-align: center; font-size: 2em; font-weight: bold;">R$ 0.00</p>
+<p style="text-align: center; font-size: 2em; font-weight: bold;" id="total">R$ 0.00</p>
 
 <h3>Divisão Atual:</h3>
 <ul>
@@ -94,11 +78,7 @@
   </li>
 </ul>
 
-<!-- Botão para zerar valores com senha -->
-<button id="botao-zerar">🔐 Zerar Valores Mensais (Admin)</button>
-
 <script>
-  // Função para carregar e mostrar os valores
   function carregarResumo() {
     const totalStr = localStorage.getItem('total');
     const total = totalStr ? parseFloat(totalStr) : 0;
@@ -114,48 +94,23 @@
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    window.valorInvestimento = investimento;
+    window.valorInvestimento = investimento; // guarda valor para botão
 
     const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
 
-    // Botão olho para mostrar/esconder investimento
-    document.getElementById('toggle-investimento').onclick = () => {
+    document.getElementById('toggle-investimento').addEventListener('click', () => {
       if (investimentoElem.textContent === '••••••••') {
         investimentoElem.textContent = `R$ ${window.valorInvestimento.toFixed(2)}`;
       } else {
         investimentoElem.textContent = '••••••••';
       }
-    };
+    });
   }
 
-  // Função para zerar valores, protegida por senha
-  function zerarValores() {
-    const senha = prompt("Digite a senha de administrador:");
-    if (senha === "1234") {
-      localStorage.setItem('total', '0'); // zera total no armazenamento local
-
-      // Atualiza a página para mostrar zeros
-      document.getElementById('total').textContent = `R$ 0.00`;
-      document.getElementById('dizimo').textContent = `R$ 0.00`;
-      document.getElementById('contas').textContent = `R$ 0.00`;
-      document.getElementById('alimentacao').textContent = `R$ 0.00`;
-
-      // Investimento fica como está (não mexe)
-
-    } else {
-      alert("❌ Senha incorreta. Ação cancelada.");
-    }
-  }
-
-  // Evento para o botão zerar chamar a função zerarValores
-  document.getElementById('botao-zerar').addEventListener('click', zerarValores);
-
-  // Quando a página carregar, chama carregarResumo para mostrar os dados
   window.onload = carregarResumo;
 </script>
 
 </body>
 </html>
-
      
