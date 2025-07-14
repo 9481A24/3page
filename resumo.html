@@ -1,4 +1,4 @@
- 
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -57,7 +57,7 @@
 <body>
 
 <nav>
-  <a href="entradas.html">Entradas</a> |
+  <a href="index.html">Entradas</a> |
   <a href="resumo.html">Resumo</a> |
   <a href="historico.html">Histórico</a>
 </nav>
@@ -80,8 +80,8 @@
 
 <!-- Firebase -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBqYQKqnPKSm0GyziIsGNmyamEevpki0YE",
@@ -95,14 +95,13 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  async function carregarResumoFirebase() {
-    const docRef = doc(db, "financeiro", "resumo");
-    const docSnap = await getDoc(docRef);
-
+  async function carregarResumo() {
+    const querySnapshot = await getDocs(collection(db, "entradas"));
     let total = 0;
-    if (docSnap.exists()) {
-      total = parseFloat(docSnap.data().total || 0);
-    }
+    querySnapshot.forEach(doc => {
+      const dados = doc.data();
+      total += parseFloat(dados.valor);
+    });
 
     document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
 
@@ -115,20 +114,16 @@
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    window.valorInvestimento = investimento;
     const investimentoElem = document.getElementById('investimento-valor');
-    investimentoElem.textContent = '••••••••';
+    let visivel = false;
 
     document.getElementById('toggle-investimento').addEventListener('click', () => {
-      if (investimentoElem.textContent === '••••••••') {
-        investimentoElem.textContent = `R$ ${window.valorInvestimento.toFixed(2)}`;
-      } else {
-        investimentoElem.textContent = '••••••••';
-      }
+      visivel = !visivel;
+      investimentoElem.textContent = visivel ? `R$ ${investimento.toFixed(2)}` : '••••••••';
     });
   }
 
-  carregarResumoFirebase();
+  carregarResumo();
 </script>
 
 </body>
