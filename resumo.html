@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -53,22 +52,6 @@
     font-size: 20px;
     margin-left: 8px;
   }
-  #botao-zerar {
-    display: block;
-    margin: 25px auto;
-    padding: 12px 25px;
-    font-size: 1em;
-    font-weight: bold;
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  #botao-zerar:hover {
-    background-color: #c9302c;
-  }
 </style>
 </head>
 <body>
@@ -95,75 +78,38 @@
   </li>
 </ul>
 
-<button id="botao-zerar">Zerar Dízimo, Contas e Alimentação</button>
-
 <script>
   function carregarResumo() {
     const totalStr = localStorage.getItem('total');
     const total = totalStr ? parseFloat(totalStr) : 0;
 
-    let investimentoAcumulado = parseFloat(localStorage.getItem('investimentoAcumulado')) || 0;
+    document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
 
-    // Se total for menor que investimento acumulado, corrige total para investimento acumulado
-    let totalCorrigido = total < investimentoAcumulado ? investimentoAcumulado : total;
+    const dizimo = total * 0.10;
+    const contas = total * 0.30;
+    const alimentacao = total * 0.30;
+    const investimento = total * 0.30;
 
-    const valorParaDividir = totalCorrigido - investimentoAcumulado;
-
-    const dizimo = valorParaDividir * 0.10;
-    const contas = valorParaDividir * 0.30;
-    const alimentacao = valorParaDividir * 0.30;
-
-    document.getElementById('total').textContent = `R$ ${totalCorrigido.toFixed(2)}`;
     document.getElementById('dizimo').textContent = `R$ ${dizimo.toFixed(2)}`;
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    window.valorInvestimento = investimentoAcumulado;
+    window.valorInvestimento = investimento; // guarda valor para botão
 
     const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
 
-    const toggleBtn = document.getElementById('toggle-investimento');
-    toggleBtn.onclick = () => {
+    document.getElementById('toggle-investimento').addEventListener('click', () => {
       if (investimentoElem.textContent === '••••••••') {
         investimentoElem.textContent = `R$ ${window.valorInvestimento.toFixed(2)}`;
       } else {
         investimentoElem.textContent = '••••••••';
       }
-    };
+    });
   }
-
-  function zerarValores() {
-    const totalStr = localStorage.getItem('total');
-    const total = totalStr ? parseFloat(totalStr) : 0;
-
-    const investimentoAtual = total * 0.30;
-
-    let investimentoAcumulado = parseFloat(localStorage.getItem('investimentoAcumulado')) || 0;
-
-    investimentoAcumulado += investimentoAtual;
-
-    localStorage.setItem('investimentoAcumulado', investimentoAcumulado.toFixed(2));
-
-    // Aqui zera o total para começar de novo
-    localStorage.setItem('total', '0');
-
-    document.getElementById('total').textContent = `R$ 0.00`;
-    document.getElementById('dizimo').textContent = `R$ 0.00`;
-    document.getElementById('contas').textContent = `R$ 0.00`;
-    document.getElementById('alimentacao').textContent = `R$ 0.00`;
-
-    const investimentoElem = document.getElementById('investimento-valor');
-    investimentoElem.textContent = '••••••••';
-
-    window.valorInvestimento = investimentoAcumulado;
-  }
-
-  document.getElementById('botao-zerar').addEventListener('click', zerarValores);
 
   window.onload = carregarResumo;
 </script>
 
 </body>
 </html>
-
