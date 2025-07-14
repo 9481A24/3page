@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Resumo Financeiro com Investimento Acumulado</title>
+<title>Resumo Financeiro</title>
 <style>
   body {
     font-family: 'Segoe UI', sans-serif;
@@ -51,22 +52,6 @@
     font-size: 20px;
     margin-left: 8px;
   }
-  .botao-zerar {
-    display: block;
-    margin: 30px auto 0;
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #ff4d4d, #cc0000);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform 0.2s, background 0.3s;
-  }
-  .botao-zerar:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, #e60000, #990000);
-  }
 </style>
 </head>
 <body>
@@ -93,90 +78,38 @@
   </li>
 </ul>
 
-<button class="botao-zerar" onclick="zerarValores()">🔐 Zerar Valores Mensais (Admin)</button>
-
 <script>
   function carregarResumo() {
-    // Pega total acumulado
-    const totalStr = localStorage.getItem('total') || "0";
-    const total = parseFloat(totalStr);
+    const totalStr = localStorage.getItem('total');
+    const total = totalStr ? parseFloat(totalStr) : 0;
 
-    // Pega investimento acumulado (não zera)
-    const investimentoAcumuladoStr = localStorage.getItem('investimentoAcumulado') || "0";
-    const investimentoAcumulado = parseFloat(investimentoAcumuladoStr);
-
-    // Mostra total atual
     document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
 
-    // Calcula divisões sobre o total (menos investimento, que já é acumulado)
     const dizimo = total * 0.10;
     const contas = total * 0.30;
     const alimentacao = total * 0.30;
+    const investimento = total * 0.30;
 
-    // Atualiza valores na tela
     document.getElementById('dizimo').textContent = `R$ ${dizimo.toFixed(2)}`;
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    // Guarda investimento acumulado globalmente para o botão olho
-    window.valorInvestimento = investimentoAcumulado;
+    window.valorInvestimento = investimento; // guarda valor para botão
 
     const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
 
-    // Botão para mostrar/ocultar investimento acumulado
-    document.getElementById('toggle-investimento').onclick = () => {
+    document.getElementById('toggle-investimento').addEventListener('click', () => {
       if (investimentoElem.textContent === '••••••••') {
         investimentoElem.textContent = `R$ ${window.valorInvestimento.toFixed(2)}`;
       } else {
         investimentoElem.textContent = '••••••••';
       }
-    };
+    });
   }
 
-  // Função para zerar os valores (menos investimento acumulado), pedindo senha
-  function zerarValores() {
-    const senha = prompt("Digite a senha do administrador para zerar os valores:");
-    if (senha === "1234") {
-      // Pega total atual e investimento acumulado
-      const totalAtual = parseFloat(localStorage.getItem('total') || "0");
-      const investimentoAcumulado = parseFloat(localStorage.getItem('investimentoAcumulado') || "0");
-
-      // Calcula o investimento do mês atual para acumular
-      const investimentoMes = totalAtual * 0.30;
-
-      // Atualiza investimento acumulado somando investimento do mês
-      const novoInvestimentoAcumulado = investimentoAcumulado + investimentoMes;
-      localStorage.setItem('investimentoAcumulado', novoInvestimentoAcumulado.toFixed(2));
-
-      // Zera o total, para começar novo mês
-      localStorage.setItem('total', '0');
-
-      // Atualiza a interface para refletir os valores zerados
-      document.getElementById('total').textContent = 'R$ 0.00';
-      document.getElementById('dizimo').textContent = 'R$ 0.00';
-      document.getElementById('contas').textContent = 'R$ 0.00';
-      document.getElementById('alimentacao').textContent = 'R$ 0.00';
-
-      // Investimento fica escondido, mas já acumulado no localStorage
-      const investimentoElem = document.getElementById('investimento-valor');
-      investimentoElem.textContent = '••••••••';
-
-      // Atualiza valorInvestimento para o botão olho
-      window.valorInvestimento = novoInvestimentoAcumulado;
-      
-      // Não exibe alertas, mas você pode adicionar se quiser
-
-    } else {
-      // Senha incorreta: nada faz, pode adicionar alerta se desejar
-    }
-  }
-
-  // Carrega resumo quando abrir a página
   window.onload = carregarResumo;
 </script>
 
 </body>
 </html>
-
-     
