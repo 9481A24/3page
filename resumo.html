@@ -1,5 +1,5 @@
 
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
@@ -52,6 +52,23 @@
     font-size: 20px;
     margin-left: 8px;
   }
+  .botao-zerar {
+    text-align: center;
+    margin-top: 30px;
+  }
+  .botao-zerar button {
+    padding: 10px 20px;
+    font-size: 1em;
+    background: #e67e22;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .botao-zerar button:hover {
+    background: #d35400;
+  }
 </style>
 </head>
 <body>
@@ -77,6 +94,11 @@
     <button id="toggle-investimento" aria-label="Mostrar/ocultar investimento">👁️</button>
   </li>
 </ul>
+
+<!-- 🔄 BOTÃO PARA ZERAR VALORES MENSALMENTE -->
+<div class="botao-zerar">
+  <button onclick="apagarValoresMensais()">🔄 Zerar Valores Mensais</button>
+</div>
 
 <script>
   function carregarResumo() {
@@ -108,8 +130,19 @@
     });
   }
 
+  function apagarValoresMensais() {
+    if (confirm("Deseja zerar Total, Dízimo, Contas e Alimentação? O Investimento será mantido.")) {
+      localStorage.removeItem('total');
+      localStorage.removeItem('dizimo');
+      localStorage.removeItem('contas');
+      localStorage.removeItem('alimentacao');
+      location.reload();
+    }
+  }
+
   window.onload = carregarResumo;
 </script>
 
 </body>
 </html>
+
