@@ -1,63 +1,62 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Resumo Financeiro</title>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f0f2f5;
-    padding: 20px;
-    color: #333;
-    max-width: 720px;
-    margin: auto;
-  }
-  nav {
-    margin-bottom: 20px;
-  }
-  nav a {
-    margin-right: 15px;
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  nav a:hover {
-    text-decoration: underline;
-  }
-  h2, h3 {
-    text-align: center;
-  }
-  ul {
-    list-style: none;
-    padding-left: 0;
-    font-size: 1.1em;
-  }
-  ul li {
-    margin: 8px 0;
-    display: flex;
-    justify-content: space-between;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  #investimento-valor {
-    user-select: none;
-    font-weight: bold;
-  }
-  #toggle-investimento {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    margin-left: 8px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Resumo Financeiro</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      padding: 20px;
+      color: #333;
+      max-width: 720px;
+      margin: auto;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+      font-size: 1.1em;
+    }
+    ul li {
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #investimento-valor {
+      user-select: none;
+      font-weight: bold;
+    }
+    #toggle-investimento {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      margin-left: 8px;
+    }
+  </style>
 </head>
 <body>
 
 <nav>
-  <a href="entradas.html">Entradas</a> |
+  <a href="index.html">Entradas</a> |
   <a href="resumo.html">Resumo</a> |
   <a href="historico.html">Histórico</a>
 </nav>
@@ -78,10 +77,16 @@
   </li>
 </ul>
 
-<script>
-  function carregarResumo() {
-    const totalStr = localStorage.getItem('total');
-    const total = totalStr ? parseFloat(totalStr) : 0;
+<!-- Firebase + Main -->
+<script type="module" src="firebase.js"></script>
+<script type="module" src="main.js"></script>
+
+<!-- Script para buscar resumo no Firebase -->
+<script type="module">
+  import { buscarTotal } from './main.js';
+
+  async function carregarResumoFirebase() {
+    const total = await buscarTotal();
 
     document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
 
@@ -94,9 +99,8 @@
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    window.valorInvestimento = investimento; // guarda valor para botão
-
     const investimentoElem = document.getElementById('investimento-valor');
+    window.valorInvestimento = investimento;
     investimentoElem.textContent = '••••••••';
 
     document.getElementById('toggle-investimento').addEventListener('click', () => {
@@ -108,9 +112,10 @@
     });
   }
 
-  window.onload = carregarResumo;
+  window.onload = carregarResumoFirebase;
 </script>
 
 </body>
 </html>
+
 
