@@ -56,7 +56,7 @@
 <body>
 
 <nav>
-  <a href="index.html">Entradas</a> |
+  <a href="entradas.html">Entradas</a> |
   <a href="resumo.html">Resumo</a> |
   <a href="historico.html">Histórico</a>
 </nav>
@@ -77,16 +77,31 @@
   </li>
 </ul>
 
-<!-- Firebase + Main -->
-<script type="module" src="firebase.js"></script>
-<script type="module" src="main.js"></script>
-
-<!-- Script para buscar resumo no Firebase -->
+<!-- Firebase -->
 <script type="module">
-  import { buscarTotal } from './main.js';
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBqYQKqnPKSm0GyziIsGNmyamEevpki0YE",
+    authDomain: "controlefinanceiro-23fce.firebaseapp.com",
+    projectId: "controlefinanceiro-23fce",
+    storageBucket: "controlefinanceiro-23fce.appspot.com",
+    messagingSenderId: "967993151955",
+    appId: "1:967993151955:web:ac2711081550ee34519f26"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
   async function carregarResumoFirebase() {
-    const total = await buscarTotal();
+    const docRef = doc(db, "financeiro", "resumo");
+    const docSnap = await getDoc(docRef);
+
+    let total = 0;
+    if (docSnap.exists()) {
+      total = parseFloat(docSnap.data().total || 0);
+    }
 
     document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
 
@@ -99,8 +114,8 @@
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    const investimentoElem = document.getElementById('investimento-valor');
     window.valorInvestimento = investimento;
+    const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
 
     document.getElementById('toggle-investimento').addEventListener('click', () => {
@@ -112,10 +127,11 @@
     });
   }
 
-  window.onload = carregarResumoFirebase;
+  carregarResumoFirebase();
 </script>
 
 </body>
 </html>
+
 
 
