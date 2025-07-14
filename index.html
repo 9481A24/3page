@@ -1,73 +1,72 @@
 
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Entradas Financeiras</title>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f0f2f5;
-    padding: 20px;
-    color: #333;
-    max-width: 720px;
-    margin: auto;
-  }
-  nav {
-    margin-bottom: 20px;
-  }
-  nav a {
-    margin-right: 15px;
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  nav a:hover {
-    text-decoration: underline;
-  }
-  h2, h3 {
-    text-align: center;
-  }
-  label {
-    display: block;
-    margin-top: 15px;
-    font-weight: bold;
-  }
-  input[type="text"],
-  input[type="date"],
-  input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  button {
-    width: 100%;
-    margin-top: 25px;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    transition: background-color .3s;
-  }
-  button:hover {
-    background-color: #218838;
-  }
-  .entrada-bloco {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  .entrada-bloco > div {
-    flex: 1 1 48%;
-    min-width: 300px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Entradas Financeiras</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      padding: 20px;
+      color: #333;
+      max-width: 720px;
+      margin: auto;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+      transition: background-color .3s;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .entrada-bloco {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .entrada-bloco > div {
+      flex: 1 1 48%;
+      min-width: 300px;
+    }
+  </style>
 </head>
 <body>
 
@@ -89,141 +88,33 @@
     <label>💵 Valor (R$):</label>
     <input type="number" id="valor1" step="0.01" value="200" />
   </div>
-  <div>
-    <label>📝 Entrada 2 Origem:</label>
-    <input type="text" id="origem2" value="Cliente Y" />
-    <label>📅 Data Digitada:</label>
-    <input type="date" id="data2" />
-    <label>💵 Valor (R$):</label>
-    <input type="number" id="valor2" step="0.01" value="350" />
-  </div>
 </div>
 
-<h3>Entradas com data programada fixa (Altere datas no código)</h3>
-<div class="entrada-bloco">
-  <div>
-    <label>📝 Entrada 3 Origem:</label>
-    <input type="text" id="origem3" value="Cliente A" />
-    <label>💵 Valor (R$):</label>
-    <input type="number" id="valor3" step="0.01" value="300" />
-  </div>
-  <div>
-    <label>📝 Entrada 4 Origem:</label>
-    <input type="text" id="origem4" value="Cliente B" />
-    <label>💵 Valor (R$):</label>
-    <input type="number" id="valor4" step="0.01" value="300" />
-  </div>
-</div>
+<button id="btnRegistrar">Registrar Entrada</button>
 
-<button onclick="registrarEntradas()">Registrar Entradas</button>
+<!-- Firebase + Main -->
+<script type="module" src="firebase.js"></script>
+<script type="module" src="main.js"></script>
 
-<h3>Importar entradas de arquivo CSV</h3>
-<input type="file" id="fileInput" accept=".csv" />
-<button onclick="importarCSV()">Importar CSV</button>
+<!-- Código que chama a função Firebase -->
+<script type="module">
+  import { registrarEntrada } from './main.js';
 
-<script>
-  const datasProgramadas = {
-    3: '2025-07-15',
-    4: '2025-07-20'
-  };
+  async function registrarEntradasFirebase() {
+    const origem = document.getElementById('origem1').value.trim();
+    const dataStr = document.getElementById('data1').value;
+    const valor = parseFloat(document.getElementById('valor1').value);
 
-  function formatDataHora(d) {
-    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
-  }
-
-  function salvarDadosLocal(total, historico, divisaoHTML) {
-    localStorage.setItem('total', total.toFixed(2));
-    localStorage.setItem('historico', historico);
-    localStorage.setItem('divisao', divisaoHTML);
-  }
-
-  function carregarDadosSalvos() {
-    // Aqui não usado, será no resumo e histórico
-  }
-
-  function registrarEntradas() {
-    const hoje = new Date();
-    let total = parseFloat(localStorage.getItem('total')) || 0;
-    let historicoNovo = '';
-
-    for(let i =1; i <=2; i++) {
-      const origem = document.getElementById(`origem${i}`).value.trim();
-      const valor = parseFloat(document.getElementById(`valor${i}`).value);
-      const dataStr = document.getElementById(`data${i}`).value;
-
-      if(!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
-
-      const dataEntrada = new Date(dataStr);
-      if(dataEntrada <= hoje) {
-        total += valor;
-        historicoNovo += `📅 ${formatDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
-      }
-    }
-
-    for(let i = 3; i <=4; i++) {
-      const origem = document.getElementById(`origem${i}`).value.trim();
-      const valor = parseFloat(document.getElementById(`valor${i}`).value);
-      const dataStr = datasProgramadas[i];
-
-      if(!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
-
-      const dataEntrada = new Date(dataStr);
-      if(dataEntrada <= hoje) {
-        total += valor;
-        historicoNovo += `📅 ${formatDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
-      }
-    }
-
-    // Atualiza localStorage
-    let historicoExistente = localStorage.getItem('historico') || '';
-    historicoExistente += historicoNovo;
-    localStorage.setItem('historico', historicoExistente);
-    localStorage.setItem('total', total.toFixed(2));
-
-    alert('Entradas registradas com sucesso!\n\nTotal atualizado: R$ ' + total.toFixed(2));
-  }
-
-  // Função para importar CSV e lançar as entradas
-  function importarCSV() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-    if (!file) {
-      alert('Selecione um arquivo CSV para importar.');
+    if (!origem || !dataStr || isNaN(valor) || valor <= 0) {
+      alert("Preencha os dados corretamente.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const texto = e.target.result;
-      const linhas = texto.split('\n');
-      let total = parseFloat(localStorage.getItem('total')) || 0;
-      let historicoNovo = '';
 
-      linhas.forEach(linha => {
-        // Espera CSV com formato: origem,data(yyyy-mm-dd),valor
-        const colunas = linha.trim().split(',');
-        if (colunas.length < 3) return;
-        const origem = colunas[0].trim();
-        const dataStr = colunas[1].trim();
-        const valor = parseFloat(colunas[2].trim());
-        if (!origem || isNaN(valor) || valor <= 0 || !dataStr) return;
-        const dataEntrada = new Date(dataStr);
-        const hoje = new Date();
-        if (dataEntrada <= hoje) {
-          total += valor;
-          historicoNovo += `📅 ${formatDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
-        }
-      });
-
-      // Atualiza localStorage
-      let historicoExistente = localStorage.getItem('historico') || '';
-      historicoExistente += historicoNovo;
-      localStorage.setItem('historico', historicoExistente);
-      localStorage.setItem('total', total.toFixed(2));
-
-      alert('CSV importado com sucesso!\n\nTotal atualizado: R$ ' + total.toFixed(2));
-    };
-    reader.readAsText(file);
+    await registrarEntrada(origem, dataStr, valor);
+    alert("✅ Entrada salva no Firebase!");
   }
+
+  document.getElementById('btnRegistrar').onclick = registrarEntradasFirebase;
 </script>
 
 </body>
