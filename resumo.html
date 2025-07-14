@@ -1,5 +1,4 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
@@ -110,13 +109,23 @@
     const dizimo = total * 0.10;
     const contas = total * 0.30;
     const alimentacao = total * 0.30;
-    const investimento = total * 0.30;
+    let investimento = total * 0.30;
 
     document.getElementById('dizimo').textContent = `R$ ${dizimo.toFixed(2)}`;
     document.getElementById('contas').textContent = `R$ ${contas.toFixed(2)}`;
     document.getElementById('alimentacao').textContent = `R$ ${alimentacao.toFixed(2)}`;
 
-    window.valorInvestimento = investimento; // guarda valor para botão
+    // Pega investimento já salvo
+    const salvo = localStorage.getItem('investimento_acumulado');
+    let investimentoAcumulado = salvo ? parseFloat(salvo) : 0;
+
+    // Se total > 0, acumula
+    if (total > 0) {
+      investimentoAcumulado += investimento;
+      localStorage.setItem('investimento_acumulado', investimentoAcumulado.toFixed(2));
+    }
+
+    window.valorInvestimento = investimentoAcumulado;
 
     const investimentoElem = document.getElementById('investimento-valor');
     investimentoElem.textContent = '••••••••';
@@ -145,4 +154,5 @@
 
 </body>
 </html>
+
 
