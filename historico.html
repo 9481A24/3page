@@ -29,57 +29,110 @@
       text-align: center;
       margin-bottom: 15px;
     }
-    textarea {
-      width: 100%;
-      height: 400px;
+    #historico {
+      white-space: pre-wrap;
+      background: #fff;
       padding: 15px;
       border-radius: 10px;
       border: 1px solid #ccc;
-      font-family: monospace;
-      white-space: pre-wrap;
-      resize: none;
-      background: #fafafa;
+      height: 400px;
+      overflow-y: auto;
+    }
+    .botoes {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 60%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
 
 <nav>
-  <a href="entradas.html">Entradas</a> |
+  <a href="index.html">Entradas</a> |
   <a href="resumo.html">Resumo</a> |
   <a href="historico.html">Histórico</a>
 </nav>
 
 <h2>📜 Histórico das Entradas</h2>
 
-<textarea id="historico" readonly></textarea>
+<div class="botoes">
+  <input type="text" id="filtroOrigem" placeholder="Buscar por cliente (ex: Cliente X)" />
+  <button onclick="buscarHistorico()">🔍 Buscar</button>
+  <button onclick="carregarTudo()">🔄 Mostrar Todos</button>
+  <button onclick="window.print()">🖨️ Imprimir</button>
+</div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase.js"></script>
+<div id="historico">⏳ Carregando...</div>
 
-<script>
-  const db = firebase.firestore();
+<!-- Firebase + Script -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  function carregarHistorico() {
-    db.collection("financeiro").doc("resumo")
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          const historico = doc.data().historico || '';
-          document.getElementById('historico').value = historico;
-        } else {
-          document.getElementById('historico').value = '⚠️ Nenhum histórico encontrado.';
-        }
-      })
-      .catch(error => {
-        console.error("Erro ao carregar histórico:", error);
-        document.getElementById('historico').value = 'Erro ao buscar histórico.';
-      });
+  const firebaseConfig = {
+    apiKey: "AIzaSyBqYQKqnPKSm0GyziIsGNmyamEevpki0YE",
+    authDomain: "controlefinanceiro-23fce.firebaseapp.com",
+    projectId: "controlefinanceiro-23fce",
+    storageBucket: "controlefinanceiro-23fce.appspot.com",
+    messagingSenderId: "967993151955",
+    appId: "1:967993151955:web:ac2711081550ee34519f26"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function carregarTudo() {
+    const historicoDiv = document.getElementById('historico');
+    historicoDiv.textContent = '⏳ Carregando...';
+    const querySnapshot = await getDocs(collection(db, "entradas"));
+    let texto = '';
+
+    querySnapshot.forEach((doc) => {
+      const dados = doc.data();
+      const data = dados.data.toDate().toLocaleDateString();
+      texto += `📅 ${data}\nCliente: ${dados.origem}\nValor: R$ ${dados.valor.toFixed(2)}\n------------------------------\n`;
+    });
+
+    historicoDiv.textContent = texto || '⚠️ Nenhuma entrada encontrada.';
   }
 
-  window.onload = carregarHistorico;
+  async function buscarHistorico() {
+    const filtro = document.getElementById('filtroOrigem').value.toLowerCase();
+    const historicoDiv = document.getElementById('historico');
+    historicoDiv.textContent = '🔍 Buscando...';
+    const querySnapshot = await getDocs(collection(db, "entradas"));
+    let texto = '';
+
+    querySnapshot.forEach((doc) => {
+      const dados = doc.data();
+      if (dados.origem.toLowerCase().includes(filtro)) {
+        const data = dados.data.toDate().toLocaleDateString();
+        texto += `📅 ${data}\nCliente: ${dados.origem}\nValor: R$ ${dados.valor.toFixed(2)}\n------------------------------\n`;
+      }
+    });
+
+    historicoDiv.textContent = texto || '❌ Nenhuma entrada encontrada com esse nome.';
+  }
+
+  carregarTudo(); // Carrega tudo ao abrir a página
 </script>
 
 </body>
