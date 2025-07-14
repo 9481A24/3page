@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -44,7 +45,7 @@
 <body>
 
 <nav>
-  <a href="index.html">Entradas</a> |
+  <a href="entradas.html">Entradas</a> |
   <a href="resumo.html">Resumo</a> |
   <a href="historico.html">Histórico</a>
 </nav>
@@ -53,20 +54,32 @@
 
 <textarea id="historico" readonly></textarea>
 
-<!-- Firebase + Main -->
-<script type="module" src="firebase.js"></script>
-<script type="module" src="main.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase.js"></script>
 
-<!-- Script para carregar histórico do Firebase -->
-<script type="module">
-  import { buscarHistorico } from './main.js';
+<script>
+  const db = firebase.firestore();
 
-  async function carregarHistoricoFirebase() {
-    const historico = await buscarHistorico();
-    document.getElementById('historico').value = historico || 'Nenhuma entrada registrada.';
+  function carregarHistorico() {
+    db.collection("financeiro").doc("resumo")
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          const historico = doc.data().historico || '';
+          document.getElementById('historico').value = historico;
+        } else {
+          document.getElementById('historico').value = '⚠️ Nenhum histórico encontrado.';
+        }
+      })
+      .catch(error => {
+        console.error("Erro ao carregar histórico:", error);
+        document.getElementById('historico').value = 'Erro ao buscar histórico.';
+      });
   }
 
-  window.onload = carregarHistoricoFirebase;
+  window.onload = carregarHistorico;
 </script>
 
 </body>
