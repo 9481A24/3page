@@ -25,13 +25,26 @@
     nav a:hover {
       text-decoration: underline;
     }
-    h2 {
+    h2, h3 {
       text-align: center;
-      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
     button {
       width: 100%;
-      margin-top: 10px;
+      margin-top: 20px;
       padding: 12px;
       font-size: 16px;
       border-radius: 8px;
@@ -44,15 +57,22 @@
     button:hover {
       background-color: #218838;
     }
-    #totalBox {
-      margin-top: 20px;
+    .entrada-bloco {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .entrada-bloco > div {
+      flex: 1 1 48%;
+      min-width: 300px;
+    }
+    #resultado {
+      margin-top: 30px;
+      white-space: pre-wrap;
       background: #fff;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #ccc;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -64,12 +84,54 @@
   <a href="historico.html">Histórico</a>
 </nav>
 
-<h2>📃 Registro de Entradas</h2>
+<h2>📒 Registro de Entradas</h2>
+
+<h3>Entradas com data digitada</h3>
+<div class="entrada-bloco">
+  <div>
+    <label>📝 Entrada 1 Origem:</label>
+    <input type="text" id="origem1" value="Cliente X" />
+    <label>📅 Data Digitada:</label>
+    <input type="date" id="data1" />
+    <label>💵 Valor (R$):</label>
+    <input type="number" id="valor1" step="0.01" value="200" />
+  </div>
+  <div>
+    <label>📝 Entrada 2 Origem:</label>
+    <input type="text" id="origem2" value="Cliente Y" />
+    <label>📅 Data Digitada:</label>
+    <input type="date" id="data2" />
+    <label>💵 Valor (R$):</label>
+    <input type="number" id="valor2" step="0.01" value="350" />
+  </div>
+</div>
+
+<h3>Entradas com data fixa (alterar no código)</h3>
+<div class="entrada-bloco">
+  <div>
+    <label>📝 Entrada 3 Origem:</label>
+    <input type="text" id="origem3" value="Cliente A" />
+    <label>💵 Valor (R$):</label>
+    <input type="number" id="valor3" step="0.01" value="300" />
+  </div>
+  <div>
+    <label>📝 Entrada 4 Origem:</label>
+    <input type="text" id="origem4" value="Cliente B" />
+    <label>💵 Valor (R$):</label>
+    <input type="number" id="valor4" step="0.01" value="300" />
+  </div>
+</div>
 
 <button onclick="registrarEntradas()">Registrar Entradas</button>
-<button onclick="calcularTotalFirebase()">🔢 Ver Total Firebase</button>
-<div id="totalBox"></div>
 
+<h3>📥 Importar de Arquivo CSV</h3>
+<input type="file" id="fileInput" accept=".csv" />
+<button onclick="importarCSV()">Importar CSV</button>
+
+<button onclick="buscarEntradas()">🔍 Buscar Entradas</button>
+<div id="resultado"></div>
+
+<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -86,25 +148,119 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  window.registrarEntradas = async function () {
-    const data = new Date();
-    await addDoc(collection(db, "entradas"), {
-      origem: "Teste",
-      valor: 100,
-      data: Timestamp.fromDate(data)
-    });
-    alert("Entrada registrada!");
+  const datasFixas = {
+    3: '2025-07-15',
+    4: '2025-07-20'
+  };
+
+  function formatarDataHora(data) {
+    return data.toLocaleDateString() + ' ' + data.toLocaleTimeString();
   }
 
-  window.calcularTotalFirebase = async function () {
-    const querySnapshot = await getDocs(collection(db, "entradas"));
+  window.registrarEntradas = async function () {
+    const hoje = new Date();
+    let historico = '';
     let total = 0;
-    querySnapshot.forEach(doc => {
-      const dados = doc.data();
-      total += dados.valor;
-    });
-    document.getElementById('totalBox').textContent = `R$ ${total.toFixed(2)}`;
-  }
+
+    for (let i = 1; i <= 2; i++) {
+      const origem = document.getElementById(`origem${i}`).value.trim();
+      const valor = parseFloat(document.getElementById(`valor${i}`).value);
+      const dataStr = document.getElementById(`data${i}`).value;
+
+      if (!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
+
+      const dataEntrada = new Date(dataStr);
+      if (dataEntrada <= hoje) {
+        await addDoc(collection(db, "entradas"), {
+          origem: origem,
+          valor: valor,
+          data: Timestamp.fromDate(dataEntrada)
+        });
+        total += valor;
+        historico += `📅 ${formatarDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
+      }
+    }
+
+    for (let i = 3; i <= 4; i++) {
+      const origem = document.getElementById(`origem${i}`).value.trim();
+      const valor = parseFloat(document.getElementById(`valor${i}`).value);
+      const dataStr = datasFixas[i];
+      const dataEntrada = new Date(dataStr);
+
+      if (!origem || isNaN(valor) || valor <= 0) continue;
+
+      if (dataEntrada <= hoje) {
+        await addDoc(collection(db, "entradas"), {
+          origem: origem,
+          valor: valor,
+          data: Timestamp.fromDate(dataEntrada)
+        });
+        total += valor;
+        historico += `📅 ${formatarDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
+      }
+    }
+
+    alert(`Entradas registradas com sucesso!\n\nTotal inserido: R$ ${total.toFixed(2)}`);
+  };
+
+  window.importarCSV = async function () {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file) {
+      alert('Selecione um arquivo CSV.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+      const texto = e.target.result;
+      const linhas = texto.split('\n');
+      const hoje = new Date();
+      let total = 0;
+      let historico = '';
+
+      for (const linha of linhas) {
+        const [origem, dataStr, valorStr] = linha.trim().split(',');
+        const valor = parseFloat(valorStr);
+        const dataEntrada = new Date(dataStr);
+
+        if (!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
+
+        if (dataEntrada <= hoje) {
+          await addDoc(collection(db, "entradas"), {
+            origem: origem,
+            valor: valor,
+            data: Timestamp.fromDate(dataEntrada)
+          });
+          total += valor;
+          historico += `📅 ${formatarDataHora(new Date())}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
+        }
+      }
+
+      alert(`Importação concluída!\n\nTotal: R$ ${total.toFixed(2)}`);
+    };
+    reader.readAsText(file);
+  };
+
+  window.buscarEntradas = async function () {
+    const resultado = document.getElementById('resultado');
+    resultado.textContent = '⏳ Buscando...';
+
+    try {
+      const querySnapshot = await getDocs(collection(db, "entradas"));
+      let texto = '';
+
+      querySnapshot.forEach((doc) => {
+        const dados = doc.data();
+        const data = dados.data.toDate().toLocaleDateString();
+        texto += `📅 ${data}\nCliente: ${dados.origem}\nValor: R$ ${dados.valor.toFixed(2)}\n------------------------------\n`;
+      });
+
+      resultado.textContent = texto || '⚠️ Nenhuma entrada encontrada.';
+    } catch (err) {
+      resultado.textContent = '❌ Erro ao buscar: ' + err.message;
+    }
+  };
 </script>
 
 </body>
