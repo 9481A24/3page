@@ -25,26 +25,13 @@
     nav a:hover {
       text-decoration: underline;
     }
-    h2, h3 {
+    h2 {
       text-align: center;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    input[type="text"],
-    input[type="date"],
-    input[type="number"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      margin-bottom: 30px;
     }
     button {
       width: 100%;
-      margin-top: 20px;
+      margin-top: 10px;
       padding: 12px;
       font-size: 16px;
       border-radius: 8px;
@@ -57,22 +44,15 @@
     button:hover {
       background-color: #218838;
     }
-    .entrada-bloco {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    .entrada-bloco > div {
-      flex: 1 1 48%;
-      min-width: 300px;
-    }
-    #resultado {
-      margin-top: 30px;
-      white-space: pre-wrap;
+    #totalBox {
+      margin-top: 20px;
       background: #fff;
       padding: 15px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -84,14 +64,11 @@
   <a href="historico.html">Histórico</a>
 </nav>
 
-<h2>📒 Registro de Entradas</h2>
-
-<!-- Formulário mantido igual -->
-<!-- ... (os campos do formulário permanecem como estavam) ... -->
+<h2>📃 Registro de Entradas</h2>
 
 <button onclick="registrarEntradas()">Registrar Entradas</button>
-<button onclick="buscarTotal()">🔢 Ver Total Firebase</button>
-<div id="resultado"></div>
+<button onclick="calcularTotalFirebase()">🔢 Ver Total Firebase</button>
+<div id="totalBox"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -110,43 +87,24 @@
   const db = getFirestore(app);
 
   window.registrarEntradas = async function () {
-    const hoje = new Date();
-    let historicoNovo = '';
+    const data = new Date();
+    await addDoc(collection(db, "entradas"), {
+      origem: "Teste",
+      valor: 100,
+      data: Timestamp.fromDate(data)
+    });
+    alert("Entrada registrada!");
+  }
 
-    for (let i = 1; i <= 4; i++) {
-      const origem = document.getElementById(`origem${i}`)?.value.trim();
-      const valor = parseFloat(document.getElementById(`valor${i}`)?.value);
-      const dataStr = i <= 2 ? document.getElementById(`data${i}`)?.value : (i === 3 ? '2025-07-15' : '2025-07-20');
-      const dataEntrada = new Date(dataStr);
-      if (!origem || isNaN(valor) || valor <= 0 || !dataStr) continue;
-
-      if (dataEntrada <= hoje) {
-        await addDoc(collection(db, "entradas"), {
-          origem: origem,
-          valor: valor,
-          data: Timestamp.fromDate(dataEntrada)
-        });
-        historicoNovo += `📅 ${new Date().toLocaleString()}\nCliente: ${origem}\nValor: R$ ${valor.toFixed(2)}\n------------------------------\n`;
-      }
-    }
-    alert("Entradas registradas com sucesso no Firebase!");
-  };
-
-  window.buscarTotal = async function () {
-    const resultadoDiv = document.getElementById('resultado');
-    resultadoDiv.innerHTML = '⏳ Somando entradas...';
-    try {
-      const querySnapshot = await getDocs(collection(db, "entradas"));
-      let total = 0;
-      querySnapshot.forEach((doc) => {
-        const dados = doc.data();
-        total += dados.valor;
-      });
-      resultadoDiv.textContent = `💰 Total geral no Firebase: R$ ${total.toFixed(2)}`;
-    } catch (erro) {
-      resultadoDiv.textContent = '❌ Erro ao buscar total: ' + erro.message;
-    }
-  };
+  window.calcularTotalFirebase = async function () {
+    const querySnapshot = await getDocs(collection(db, "entradas"));
+    let total = 0;
+    querySnapshot.forEach(doc => {
+      const dados = doc.data();
+      total += dados.valor;
+    });
+    document.getElementById('totalBox').textContent = `R$ ${total.toFixed(2)}`;
+  }
 </script>
 
 </body>
